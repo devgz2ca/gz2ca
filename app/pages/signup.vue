@@ -30,25 +30,21 @@
             required
           />
 
-          <div class="space-y-2">
-            <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
-            <PasswordInput
-              id="password"
-              v-model="form.password"
-              placeholder="请输入密码（至少6位）"
-              required
-            />
-          </div>
+          <PasswordInput
+            id="password"
+            v-model="form.password"
+            label="密码"
+            placeholder="请输入密码（至少6位）"
+            required
+          />
 
-          <div class="space-y-2">
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
-            <PasswordInput
-              id="confirmPassword"
-              v-model="form.confirmPassword"
-              placeholder="请再次输入密码"
-              required
-            />
-          </div>
+          <PasswordInput
+            id="confirmPassword"
+            v-model="form.confirmPassword"
+            label="确认密码"
+            placeholder="请再次输入密码"
+            required
+          />
 
           <!-- Error Message -->
           <div v-if="errorMessage" class="text-red-600 text-sm text-center">
