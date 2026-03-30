@@ -1,10 +1,10 @@
 <template>
   <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
+      <div class="flex justify-between items-center">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center space-x-3 group">
-          <span class="font-semibold text-gray-900">{{ SITE_NAME }}</span>
+          <img src="/logo.png" alt="Logo" class="w-20 h-20 rounded-xl" />
         </NuxtLink>
 
         <!-- Desktop Navigation -->
