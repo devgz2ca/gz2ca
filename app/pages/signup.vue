@@ -30,25 +30,25 @@
             required
           />
 
-          <Input
-            id="password"
-            v-model="form.password"
-            label="密码"
-            type="password"
-            placeholder="请输入密码（至少6位）"
-            required
-            :minlength="6"
-          />
+          <div class="space-y-2">
+            <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
+            <PasswordInput
+              id="password"
+              v-model="form.password"
+              placeholder="请输入密码（至少6位）"
+              required
+            />
+          </div>
 
-          <Input
-            id="confirmPassword"
-            v-model="form.confirmPassword"
-            label="确认密码"
-            type="password"
-            placeholder="请再次输入密码"
-            required
-            :minlength="6"
-          />
+          <div class="space-y-2">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
+            <PasswordInput
+              id="confirmPassword"
+              v-model="form.confirmPassword"
+              placeholder="请再次输入密码"
+              required
+            />
+          </div>
 
           <!-- Error Message -->
           <div v-if="errorMessage" class="text-red-600 text-sm text-center">
@@ -84,6 +84,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Input from '~/components/form/Input.vue'
+import PasswordInput from '~/components/form/PasswordInput.vue'
 import Button from '~/components/form/Button.vue'
 import LinkButton from '~/components/form/LinkButton.vue'
 import { post } from '~/utils/http'
