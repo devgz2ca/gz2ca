@@ -3,7 +3,7 @@
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center">
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center space-x-3 group">
+        <NuxtLink to="/" class="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
           <img src="/logo.png" alt="Logo" class="w-20 h-20 rounded-xl" />
         </NuxtLink>
 
