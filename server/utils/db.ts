@@ -12,7 +12,7 @@ export async function connectDB() {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
     })
-    isConnected = db.connections[0].readyState === 1
+    isConnected = db.connections?.[0]?.readyState === 1
     console.log('MongoDB connected successfully')
   } catch (error) {
     console.error('MongoDB connection error:', error)
