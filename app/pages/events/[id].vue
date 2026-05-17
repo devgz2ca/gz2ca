@@ -100,8 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed } from 'vue'
 import Button from '~/components/form/Button.vue'
 import EventInfo from '~/components/event/EventInfo.vue'
 import EventOrganizer from '~/components/event/EventOrganizer.vue'
@@ -112,53 +111,46 @@ import EventDetailDescription from '~/components/event/EventDetailDescription.vu
 import EventDetailMedia from '~/components/event/EventDetailMedia.vue'
 import EventDetailGallery from '~/components/event/EventDetailGallery.vue'
 import EventDetailBackButton from '~/components/event/EventDetailBackButton.vue'
-import { get, post, del, put } from '~/utils/http'
+import { post, del, put } from '~/utils/http'
 import { useUser } from '~/composables/useAuth'
 import { SITE_NAME } from '~/constants'
-import {formatDate} from '~/utils/date'
+import { formatDate } from '~/utils/date'
 
 const route = useRoute()
 const { user: currentUser } = useUser()
 
-const event = ref<any>(null)
-const organizer = ref<any>(null)
+const { data: eventData, pending: loading, error: fetchError, refresh } = await useFetch(`/api/events/${route.params.id}`, {
+  key: `event-${route.params.id}`
+})
+
+const event = computed(() => eventData.value?.event || null)
+const organizer = computed(() => eventData.value?.organizer || null)
 const media = ref<any[]>([])
-const loading = ref(false)
 const mediaLoading = ref(false)
-const errorMessage = ref('')
 const showEditModal = ref(false)
+
+const errorMessage = computed(() => {
+  if (fetchError.value) {
+    return (fetchError.value as any).data?.message || '加载活动失败'
+  }
+  if (eventData.value && !eventData.value.success) {
+    return eventData.value.message || '加载活动失败'
+  }
+  return ''
+})
 
 const isOwner = computed(() => {
   return currentUser.value && event.value && currentUser.value._id === event.value.user_id
 })
 
-const loadEvent = async () => {
-  loading.value = true
-  errorMessage.value = ''
-
-  try {
-    const response = await get(`/api/events/${route.params.id}`)
-    if (response.success) {
-      event.value = response.event
-      organizer.value = response.organizer
-      media.value = response.medias
-    } else {
-      errorMessage.value = response.message || '加载活动失败'
-    }
-  } catch (error: any) {
-    errorMessage.value = error.data?.message || '加载活动失败'
-  } finally {
-    loading.value = false
-  }
-}
-
 const loadMedia = async () => {
+  if (!route.params.id) return
   mediaLoading.value = true
 
   try {
-    const response = await get(`/api/events/${route.params.id}/media`)
-    if (response.success) {
-      media.value = response.media
+    const response = await useFetch(`/api/events/${route.params.id}/media`)
+    if (response.data.value?.success) {
+      media.value = response.data.value.media
     }
   } catch (error: any) {
     console.error('Failed to load media:', error)
@@ -175,7 +167,7 @@ const handleUpdateEvent = async (eventId: string | null, data: any) => {
   try {
     await put(`/api/events/${event.value._id}`, data)
     showEditModal.value = false
-    loadEvent()
+    refresh()
   } catch (error: any) {
     throw error
   }
@@ -223,7 +215,7 @@ const handleDeleteImage = async (item: any) => {
 }
 
 onMounted(() => {
-  loadEvent()
+  loadMedia()
 })
 
 const eventTitle = computed(() => event.value?.tl || '活动详情')
