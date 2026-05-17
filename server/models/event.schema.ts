@@ -31,5 +31,10 @@ export const Event = defineMongooseModel('Event', {
   },
   mt: {
     type: Date,
+  },
+  url: {
+    type: String,
+    required: true,
+    trim: true
   }
 })

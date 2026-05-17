@@ -230,11 +230,15 @@ const eventTitle = computed(() => event.value?.tl || '活动详情')
 
 useHead({
   title: computed(() => `${eventTitle.value} - ${SITE_NAME}`),
+  link: computed(() => event.value?.url ? [
+    { rel: 'canonical', href: event.value.url }
+  ] : []),
   meta: computed(() => [
     { name: 'description', content: event.value?.desc || '查看此活动的详细信息' },
     { name: 'keywords', content: `${SITE_NAME}, 活动, ${event.value?.tl || ''}` },
     { property: 'og:title', content: eventTitle.value },
     { property: 'og:description', content: event.value?.desc || '查看此活动的详细信息' },
+    { property: 'og:url', content: event.value?.url || '' },
     { property: 'og:type', content: 'website' }
   ])
 })

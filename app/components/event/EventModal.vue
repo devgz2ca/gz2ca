@@ -29,6 +29,13 @@
           type="date"
           required
         />
+        <Input
+          id="url"
+          v-model="form.url"
+          label="活动链接 (SEO)"
+          placeholder="my-event-url"
+          required
+        />
         <AddressAutocomplete
           id="address"
           v-model="form.address"
@@ -92,6 +99,7 @@ interface EventData {
   city?: string
   status?: string
   place_id?: string | any
+  url?: string
 }
 
 interface Props {
@@ -113,7 +121,8 @@ const form = ref({
   desc: '',
   date: '',
   address: '',
-  status: 'draft'
+  status: 'draft',
+  url: ''
 })
 
 const loading = ref(false)
@@ -132,7 +141,8 @@ const handleSubmit = async () => {
       desc: form.value.desc,
       date: new Date(form.value.date),
       place: selectedPlace.value,
-      status: form.value.status
+      status: form.value.status,
+      url: form.value.url
     })
   } catch (error: any) {
     errorMessage.value = error.data?.message || (isEdit.value ? '更新活动失败' : '创建活动失败')
@@ -157,7 +167,8 @@ const resetForm = () => {
       desc: '',
       date: '',
       address: '',
-      status: 'draft'
+      status: 'draft',
+      url: ''
     }
     selectedPlace.value = null
   }
@@ -172,6 +183,7 @@ const initForm = () => {
     form.value.date = props.eventData.date?.split('T')[0] || ''
     form.value.address = props.eventData.place_id?.full_address || ''
     form.value.status = props.eventData.status || 'draft'
+    form.value.url = props.eventData.url || ''
     
     if (props.eventData.place_id) {
       selectedPlace.value = {
@@ -188,7 +200,8 @@ const initForm = () => {
       desc: '',
       date: '',
       address: '',
-      status: 'draft'
+      status: 'draft',
+      url: ''
     }
     selectedPlace.value = null
   }
