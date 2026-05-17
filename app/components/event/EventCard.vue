@@ -117,6 +117,6 @@ defineEmits<{
 }>()
 
 const handleClick = () => {
-  router.push(`/events/${props.event._id}`)
+  router.push(`/events/${props.event.url || props.event._id}`)
 }
 </script>

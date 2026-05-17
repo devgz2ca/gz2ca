@@ -1,4 +1,5 @@
 import { defineEventHandler, getRouterParam } from 'h3'
+import mongoose from 'mongoose'
 import { Event } from '../../models/event.schema'
 import { User } from '../../models/user.schema'
 import { Media } from '../../models/media.schema'
@@ -15,7 +16,12 @@ export default defineEventHandler(async (event) => {
   try {
     await connectDB();
 
-    const eventDoc = await Event.findById(id).populate('place_id')
+    let eventDoc
+    if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+      eventDoc = await Event.findById(id).populate('place_id')
+    } else {
+      eventDoc = await Event.findOne({ url: id }).populate('place_id')
+    }
 
     if (!eventDoc) {
       return handleNotFound('活动不存在')
