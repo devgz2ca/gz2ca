@@ -89,7 +89,7 @@
       :data-placeholder="placeholder"
       @input="handleInput"
       @blur="handleBlur"
-      class="prose prose-sm max-w-none min-h-[120px] p-3 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+      class="min-h-[120px] p-3 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none leading-relaxed [&_h3]:text-base [&_h3]:font-semibold [&_h3]:my-2 [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-1 [&_p]:my-2 empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400"
       :class="{ 'rounded-t-none': !disabled }"
     ></div>
   </div>
@@ -121,9 +121,36 @@ const execCommand = (command: string, value?: string) => {
   editorRef.value?.focus()
 }
 
+const addClassesToElements = (html: string): string => {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+  
+  doc.querySelectorAll('h3').forEach(el => {
+    el.className = 'text-base font-semibold my-2'
+  })
+  doc.querySelectorAll('p').forEach(el => {
+    if (el.textContent?.trim()) {
+      el.className = 'my-2'
+    }
+  })
+  doc.querySelectorAll('ul').forEach(el => {
+    el.className = 'pl-5 my-2 list-disc'
+  })
+  doc.querySelectorAll('ol').forEach(el => {
+    el.className = 'pl-5 my-2 list-decimal'
+  })
+  doc.querySelectorAll('li').forEach(el => {
+    el.className = 'my-1'
+  })
+  
+  return doc.body.innerHTML
+}
+
 const handleInput = () => {
   if (editorRef.value) {
-    emit('update:modelValue', editorRef.value.innerHTML)
+    const rawHtml = editorRef.value.innerHTML
+    const processedHtml = addClassesToElements(rawHtml)
+    emit('update:modelValue', processedHtml)
   }
 }
 
@@ -154,33 +181,3 @@ defineExpose({
 })
 </script>
 
-<style scoped>
-[contenteditable]:empty:before {
-  content: attr(data-placeholder);
-  color: #9ca3af;
-}
-
-.prose {
-  line-height: 1.6;
-}
-
-.prose :deep(h3) {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0.5rem 0;
-}
-
-.prose :deep(ul),
-.prose :deep(ol) {
-  padding-left: 1.25rem;
-  margin: 0.5rem 0;
-}
-
-.prose :deep(li) {
-  margin: 0.25rem 0;
-}
-
-.prose :deep(p) {
-  margin: 0.5rem 0;
-}
-</style>
