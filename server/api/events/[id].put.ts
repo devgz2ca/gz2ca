@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event);
-    const { tl, desc, date, place, status,url } = body;
+    const { tl, desc, date, place, status,url, category } = body;
 
     const place_id = place ? await upsertPlace(place) : existingEvent.place_id;
 
@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
         place_id,
         status,
         url,
+        category,
         mt: new Date()
       },
       { new: true, runValidators: true }
