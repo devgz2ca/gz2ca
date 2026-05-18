@@ -36,6 +36,17 @@
           placeholder="my-event-url"
           required
         />
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">分类</label>
+          <select
+            v-model="form.category"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+          >
+            <option value="event">活动</option>
+            <option value="restaurant">餐厅</option>
+            <option value="tutorial">教程/博客</option>
+          </select>
+        </div>
         <AddressAutocomplete
           id="address"
           v-model="form.address"
@@ -100,6 +111,7 @@ interface EventData {
   status?: string
   place_id?: string | any
   url?: string
+  category?: string
 }
 
 interface Props {
@@ -122,7 +134,8 @@ const form = ref({
   date: '',
   address: '',
   status: 'draft',
-  url: ''
+  url: '',
+  category: 'event'
 })
 
 const loading = ref(false)
@@ -142,7 +155,8 @@ const handleSubmit = async () => {
       date: new Date(form.value.date),
       place: selectedPlace.value,
       status: form.value.status,
-      url: form.value.url
+      url: form.value.url,
+      category: form.value.category
     })
   } catch (error: any) {
     errorMessage.value = error.data?.message || (isEdit.value ? '更新活动失败' : '创建活动失败')
@@ -168,7 +182,8 @@ const resetForm = () => {
       date: '',
       address: '',
       status: 'draft',
-      url: ''
+      url: '',
+      category: 'event'
     }
     selectedPlace.value = null
   }
@@ -184,6 +199,7 @@ const initForm = () => {
     form.value.address = props.eventData.place_id?.full_address || ''
     form.value.status = props.eventData.status || 'draft'
     form.value.url = props.eventData.url || ''
+    form.value.category = props.eventData.category || 'event'
     
     if (props.eventData.place_id) {
       selectedPlace.value = {
@@ -201,7 +217,8 @@ const initForm = () => {
       date: '',
       address: '',
       status: 'draft',
-      url: ''
+      url: '',
+      category: 'event'
     }
     selectedPlace.value = null
   }

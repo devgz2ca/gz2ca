@@ -36,5 +36,10 @@ export const Event = defineMongooseModel('Event', {
     type: String,
     required: true,
     trim: true
+  },
+  category: {
+    type: String,
+    required: true,
+    default: 'event',
   }
 })
