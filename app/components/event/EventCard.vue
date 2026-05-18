@@ -36,7 +36,7 @@
 
       <!-- Description -->
       <p class="text-gray-600 mb-4 line-clamp-3 text-sm leading-relaxed">
-        {{ event.desc || '暂无描述' }}
+        {{ stripHtml(event.desc) || '暂无描述' }}
       </p>
 
       <!-- Event Info -->
@@ -115,6 +115,11 @@ defineEmits<{
   (e: 'edit', event: any): void
   (e: 'delete', event: any): void
 }>()
+
+const stripHtml = (html: string): string => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, '').trim()
+}
 
 const handleClick = () => {
   router.push(`/events/${props.event.url || props.event._id}`)
