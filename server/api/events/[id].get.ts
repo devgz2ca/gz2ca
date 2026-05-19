@@ -1,10 +1,10 @@
 import { defineEventHandler, getRouterParam } from 'h3'
-import mongoose from 'mongoose'
 import { Event } from '../../models/event.schema'
 import { User } from '../../models/user.schema'
 import { Media } from '../../models/media.schema'
 import { handleBadRequest, handleNotFound, handleInternalError } from '../../utils/error'
 import { connectDB } from '../../utils/db'
+import { isValidObjectId } from '../../utils/mongo'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     await connectDB();
 
     let eventDoc
-    if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+    if (isValidObjectId(id)) {
       eventDoc = await Event.findById(id).populate('place_id')
     } else {
       eventDoc = await Event.findOne({ url: id }).populate('place_id')
