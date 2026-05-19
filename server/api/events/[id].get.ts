@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const organizer = await User.findById(eventDoc.user_id).select('fn ln email avt')
-    const mediaList = await Media.find({ event_id: id }).sort({ ts: -1 })
+    const mediaList = await Media.find({ event_id: eventDoc._id }).sort({ ts: -1 })
 
     return {
       success: true,
