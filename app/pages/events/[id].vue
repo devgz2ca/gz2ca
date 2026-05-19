@@ -125,7 +125,7 @@ const { data: eventData, pending: loading, error: fetchError, refresh } = await 
 
 const event = computed(() => eventData.value?.event || null)
 const organizer = computed(() => eventData.value?.organizer || null)
-const media = ref<any[]>([])
+const media = computed(()=>eventData.value?.medias || []);
 const mediaLoading = ref(false)
 const showEditModal = ref(false)
 
@@ -144,11 +144,11 @@ const isOwner = computed(() => {
 })
 
 const loadMedia = async () => {
-  if (!route.params.id) return
+  if (!event?.value?._id) return
   mediaLoading.value = true
 
   try {
-    const response = await useFetch(`/api/events/${route.params.id}/media`)
+    const response = await useFetch(`/api/events/${event.value?._id}/media`)
     if (response.data.value?.success) {
       media.value = response.data.value.media
     }
@@ -213,10 +213,6 @@ const handleDeleteImage = async (item: any) => {
     alert('删除失败: ' + (error.data?.message || error.message || '未知错误'))
   }
 }
-
-onMounted(() => {
-  loadMedia()
-})
 
 const eventTitle = computed(() => event.value?.tl || '活动详情')
 
