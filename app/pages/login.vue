@@ -4,7 +4,36 @@
       <div class="bg-white rounded-xl shadow-lg p-8">
         <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">登录</h1>
 
-        <form @submit.prevent="handleLogin" class="space-y-6">
+        <!-- Login Mode Tabs -->
+        <div class="flex border-b border-gray-200 mb-6">
+          <button
+            type="button"
+            @click="loginMode = 'password'"
+            :class="[
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              loginMode === 'password'
+                ? 'text-[#11817b] border-b-2 border-[#11817b]'
+                : 'text-gray-500 hover:text-gray-700'
+            ]"
+          >
+            密码登录
+          </button>
+          <button
+            type="button"
+            @click="loginMode = 'code'"
+            :class="[
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              loginMode === 'code'
+                ? 'text-[#11817b] border-b-2 border-[#11817b]'
+                : 'text-gray-500 hover:text-gray-700'
+            ]"
+          >
+            验证码登录
+          </button>
+        </div>
+
+        <!-- Password Login Form -->
+        <form v-if="loginMode === 'password'" @submit.prevent="handleLogin" class="space-y-6">
           <Input
             id="email"
             v-model="form.email"
@@ -25,6 +54,57 @@
           <!-- Error Message -->
           <div v-if="errorMessage" class="text-red-600 text-sm text-center">
             {{ errorMessage }}
+          </div>
+
+          <Button
+            type="submit"
+            :loading="loading"
+            loading-text="登录中..."
+          >
+            登录
+          </Button>
+        </form>
+
+        <!-- Code Login Form -->
+        <form v-else @submit.prevent="handleCodeLogin" class="space-y-6">
+          <Input
+            id="codeEmail"
+            v-model="codeForm.email"
+            label="邮箱地址"
+            type="email"
+            placeholder="请输入邮箱地址"
+            required
+          />
+
+          <div class="flex gap-2">
+            <Input
+              id="code"
+              v-model="codeForm.code"
+              label="验证码"
+              placeholder="请输入6位验证码"
+              required
+              class="flex-1"
+            />
+            <Button
+              type="button"
+              @click="sendCode"
+              :loading="codeSending"
+              :disabled="codeCountdown > 0"
+              variant="secondary"
+              class="mt-6"
+            >
+              {{ codeCountdown > 0 ? `${codeCountdown}s` : '发送验证码' }}
+            </Button>
+          </div>
+
+          <!-- Error Message -->
+          <div v-if="errorMessage" class="text-red-600 text-sm text-center">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Success Message -->
+          <div v-if="successMessage" class="text-green-600 text-sm text-center">
+            {{ successMessage }}
           </div>
 
           <Button
@@ -98,9 +178,50 @@ const form = ref({
   password: ''
 })
 
+const codeForm = ref({
+  email: '',
+  code: ''
+})
+
+const loginMode = ref<'password' | 'code'>('password')
 const loading = ref(false)
+const codeSending = ref(false)
+const codeCountdown = ref(0)
 const googleLoading = ref(false)
 const errorMessage = ref('')
+const successMessage = ref('')
+
+let countdownTimer: ReturnType<typeof setInterval> | null = null
+
+const sendCode = async () => {
+  if (!codeForm.value.email) {
+    errorMessage.value = '请输入邮箱地址'
+    return
+  }
+
+  codeSending.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  try {
+    const response = await post('/api/auth/send-code', { email: codeForm.value.email })
+    if (response.success) {
+      successMessage.value = '验证码已发送'
+      codeCountdown.value = 60
+      countdownTimer = setInterval(() => {
+        codeCountdown.value--
+        if (codeCountdown.value <= 0 && countdownTimer) {
+          clearInterval(countdownTimer)
+          countdownTimer = null
+        }
+      }, 1000)
+    }
+  } catch (error: any) {
+    errorMessage.value = error.data?.message || '发送验证码失败'
+  } finally {
+    codeSending.value = false
+  }
+}
 
 const handleLogin = async () => {
   loading.value = true
@@ -110,13 +231,10 @@ const handleLogin = async () => {
     const response = await post('/api/auth/login', form.value)
 
     if (response.success) {
-      // Store token
       localStorage.setItem('token', response.token)
       localStorage.setItem('userId', response.user._id)
 
       errorMessage.value = '登录成功！正在跳转...'
-
-      // Re-initialize auth state
       await initAuth()
 
       setTimeout(() => {
@@ -125,6 +243,35 @@ const handleLogin = async () => {
     }
   } catch (error: any) {
     errorMessage.value = error.data?.message || '登录失败，请检查邮箱和密码'
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleCodeLogin = async () => {
+  loading.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  try {
+    const response = await post('/api/auth/verify-code', {
+      email: codeForm.value.email,
+      code: codeForm.value.code
+    })
+
+    if (response.success) {
+      localStorage.setItem('token', response.token)
+      localStorage.setItem('userId', response.user._id)
+
+      errorMessage.value = '登录成功！正在跳转...'
+      await initAuth()
+
+      setTimeout(() => {
+        navigateTo('/profile')
+      }, 1000)
+    }
+  } catch (error: any) {
+    errorMessage.value = error.data?.message || '验证码错误或已过期'
   } finally {
     loading.value = false
   }

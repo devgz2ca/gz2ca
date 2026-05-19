@@ -51,5 +51,13 @@ export const User = defineMongooseModel('User', {
   },
   mt:{
     type: Date
+  },
+  verificationCode: {
+    type: String,
+    required: false
+  },
+  verificationExpiry: {
+    type: Date,
+    required: false
   }
 })
