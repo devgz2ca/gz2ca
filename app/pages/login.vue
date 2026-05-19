@@ -76,7 +76,7 @@
             required
           />
 
-          <div class="flex gap-2">
+          <div class="grid grid-cols-2 gap-2">
             <Input
               id="code"
               v-model="codeForm.code"
