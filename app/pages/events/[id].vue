@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Button from '~/components/form/Button.vue'
 import EventInfo from '~/components/event/EventInfo.vue'
 import EventOrganizer from '~/components/event/EventOrganizer.vue'
@@ -111,7 +111,7 @@ import EventDetailDescription from '~/components/event/EventDetailDescription.vu
 import EventDetailMedia from '~/components/event/EventDetailMedia.vue'
 import EventDetailGallery from '~/components/event/EventDetailGallery.vue'
 import EventDetailBackButton from '~/components/event/EventDetailBackButton.vue'
-import { post, del, put } from '~/utils/http'
+import { get, post, del, put } from '~/utils/http'
 import { useUser } from '~/composables/useAuth'
 import { SITE_NAME } from '~/constants'
 import { formatDate } from '~/utils/date'
@@ -125,9 +125,14 @@ const { data: eventData, pending: loading, error: fetchError, refresh } = await 
 
 const event = computed(() => eventData.value?.event || null)
 const organizer = computed(() => eventData.value?.organizer || null)
-const media = computed(()=>eventData.value?.medias || []);
+const media = ref<any[]>([])
 const mediaLoading = ref(false)
 const showEditModal = ref(false)
+
+// Sync media from eventData when it changes
+watch(() => eventData.value?.medias, (newMedias) => {
+  media.value = newMedias || []
+}, { immediate: true })
 
 const errorMessage = computed(() => {
   if (fetchError.value) {
@@ -144,13 +149,13 @@ const isOwner = computed(() => {
 })
 
 const loadMedia = async () => {
-  if (!event?.value?._id) return
+  if (!event.value?._id) return
   mediaLoading.value = true
 
   try {
-    const response = await useFetch(`/api/events/${event.value?._id}/media`)
-    if (response.data.value?.success) {
-      media.value = response.data.value.media
+    const response = await get(`/api/events/${event.value._id}/media`)
+    if (response.success) {
+      media.value = response.media
     }
   } catch (error: any) {
     console.error('Failed to load media:', error)
