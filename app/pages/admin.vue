@@ -1,0 +1,46 @@
+<template>
+  <div class="min-h-screen bg-gray-100">
+    <!-- Admin Header -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-bold text-gray-900">管理后台</h1>
+          <LinkButton to="/" variant="secondary">
+            返回首页
+          </LinkButton>
+        </div>
+        
+        <!-- Admin Navigation -->
+        <nav class="mt-4 flex gap-4">
+          <NuxtLink
+            to="/admin/users"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="route.path === '/admin/users' 
+              ? 'bg-[#11817b] text-white' 
+              : 'text-gray-600 hover:bg-gray-100'"
+          >
+            用户管理
+          </NuxtLink>
+        </nav>
+      </div>
+    </header>
+    
+    <!-- Admin Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <slot />
+    </main>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import LinkButton from '~/components/form/LinkButton.vue'
+import { useAdmin } from '~/composables/useAdmin'
+
+const route = useRoute()
+const { requireAdmin } = useAdmin()
+
+onMounted(() => {
+  requireAdmin()
+})
+</script>
