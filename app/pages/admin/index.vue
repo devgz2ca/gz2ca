@@ -13,6 +13,15 @@
         <!-- Admin Navigation -->
         <nav class="mt-4 flex gap-4">
           <NuxtLink
+            to="/admin"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="route.path === '/admin' 
+              ? 'bg-[#11817b] text-white' 
+              : 'text-gray-600 hover:bg-gray-100'"
+          >
+            概览
+          </NuxtLink>
+          <NuxtLink
             to="/admin/users"
             class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             :class="route.path === '/admin/users' 
@@ -27,7 +36,10 @@
     
     <!-- Admin Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <slot />
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-900">欢迎来到管理后台</h2>
+        <p class="text-sm text-gray-500 mt-1">选择左侧菜单开始管理</p>
+      </div>
     </main>
   </div>
 </template>
