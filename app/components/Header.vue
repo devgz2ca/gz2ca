@@ -114,12 +114,18 @@ import Button from '~/components/form/Button.vue'
 import LinkButton from '~/components/form/LinkButton.vue'
 
 const route = useRoute()
-const { isLoggedIn, userName, logout } = useUser()
+const { isLoggedIn, userName, user, logout } = useUser()
 const isOpen = ref(false)
 
-const navigationMenus = computed(() => [
-  { label: '活动', to: '/' }
-])
+const navigationMenus = computed(() => {
+  const menus = [
+    { label: '活动', to: '/' }
+  ]
+  if (user.value?.role === 'admin') {
+    menus.push({ label: '管理', to: '/admin' })
+  }
+  return menus
+})
 
 const isActiveRoute = (path: string) => {
   return route.path === path

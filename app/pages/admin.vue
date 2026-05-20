@@ -35,12 +35,14 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import LinkButton from '~/components/form/LinkButton.vue'
-import { useAdmin } from '~/composables/useAdmin'
+import { useUser } from '~/composables/useAuth'
 
 const route = useRoute()
-const { requireAdmin } = useAdmin()
+const { user } = useUser()
 
 onMounted(() => {
-  requireAdmin()
+  if (!user.value || user.value.role !== 'admin') {
+    navigateTo('/')
+  }
 })
 </script>
