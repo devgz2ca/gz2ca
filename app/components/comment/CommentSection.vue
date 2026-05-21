@@ -39,7 +39,7 @@
       </div>
       <div v-else class="mb-8 p-4 bg-gray-50 rounded-lg text-center">
         <p class="text-sm text-gray-500">
-          <NuxtLink to="/login" class="text-[#11817b] hover:underline font-medium">登录</NuxtLink>
+          <button type="button" @click="emit('login-click')" class="text-[#11817b] hover:underline font-medium">登录</button>
           后即可发表评论
         </p>
       </div>
@@ -106,6 +106,10 @@ import { useUser } from '~/composables/useAuth'
 
 const props = defineProps<{
   eventId: string
+}>()
+
+const emit = defineEmits<{
+  'login-click': []
 }>()
 
 const { user: currentUser, isLoggedIn } = useUser()

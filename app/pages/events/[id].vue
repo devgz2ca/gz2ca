@@ -96,7 +96,25 @@
         <EventDetailGallery v-if="media.length > 0" :media="media" :can-delete="isOwner" @delete="handleDeleteImage" />
 
         <!-- Comments Section -->
-        <CommentSection :event-id="event._id" ref="commentSectionRef" />
+        <CommentSection :event-id="event._id" ref="commentSectionRef" @login-click="showLoginModal = true" />
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div v-if="showLoginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="closeLoginModal">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 animate-in fade-in zoom-in duration-200">
+        <button
+          type="button"
+          @click="closeLoginModal"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">登录</h2>
+        <LoginForm ref="loginFormRef" @success="onLoginSuccess" />
       </div>
     </div>
 
@@ -124,6 +142,7 @@ import EventDetailMedia from '~/components/event/EventDetailMedia.vue'
 import EventDetailGallery from '~/components/event/EventDetailGallery.vue'
 import EventDetailBackButton from '~/components/event/EventDetailBackButton.vue'
 import CommentSection from '~/components/comment/CommentSection.vue'
+import LoginForm from '~/components/auth/LoginForm.vue'
 import { get, post, del, put } from '~/utils/http'
 import { useUser } from '~/composables/useAuth'
 import { SITE_NAME } from '~/constants'
@@ -141,6 +160,8 @@ const organizer = computed(() => eventData.value?.organizer || null)
 const media = ref<any[]>([])
 const mediaLoading = ref(false)
 const showEditModal = ref(false)
+const showLoginModal = ref(false)
+const loginFormRef = ref()
 const commentSectionRef = ref()
 
 // Sync media from eventData when it changes
@@ -180,6 +201,16 @@ const loadMedia = async () => {
 
 const handleEdit = () => {
   showEditModal.value = true
+}
+
+const closeLoginModal = () => {
+  showLoginModal.value = false
+  loginFormRef.value?.reset()
+}
+
+const onLoginSuccess = () => {
+  closeLoginModal()
+  commentSectionRef.value?.loadComments()
 }
 
 const handleUpdateEvent = async (eventId: string | null, data: any) => {
