@@ -201,6 +201,8 @@ const loadEvents = async () => {
     } catch (error: any) {
       if (attempt >= maxRetries) {
         errorMessage.value = '加载活动失败'
+      } else {
+        loadEvents(); // Retry
       }
     }
   }
