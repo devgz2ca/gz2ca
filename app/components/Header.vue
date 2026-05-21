@@ -106,10 +106,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUser } from '~/composables/useAuth'
-import { SITE_NAME } from '~/constants'
 import Button from '~/components/form/Button.vue'
 import LinkButton from '~/components/form/LinkButton.vue'
 
