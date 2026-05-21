@@ -27,6 +27,10 @@ export default defineEventHandler(async (event) => {
       return handleNotFound('活动不存在')
     }
 
+    // Increment view count
+    eventDoc.views = (eventDoc.views || 0) + 1
+    await eventDoc.save()
+
     const organizer = await User.findById(eventDoc.user_id).select('fn ln email avt')
     const mediaList = await Media.find({ event_id: eventDoc._id }).sort({ ts: -1 })
 

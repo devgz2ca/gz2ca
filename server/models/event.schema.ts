@@ -41,5 +41,9 @@ export const Event = defineMongooseModel('Event', {
     type: String,
     required: true,
     default: 'event',
+  },
+  views: {
+    type: Number,
+    default: 0,
   }
 })
