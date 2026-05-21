@@ -185,16 +185,27 @@ const loadEvents = async () => {
   loading.value = true
   errorMessage.value = ''
 
-  try {
-    const response = await get('/api/events')
-    if (response.success) {
-      events.value = response.events
+  const maxRetries = 3
+  let attempt = 0
+  let loaded = false
+
+  while (attempt < maxRetries && !loaded) {
+    attempt += 1
+
+    try {
+      const response = await get('/api/events')
+      if (response.success) {
+        events.value = response.events
+      }
+      loaded = true
+    } catch (error: any) {
+      if (attempt >= maxRetries) {
+        errorMessage.value = '加载活动失败'
+      }
     }
-  } catch (error: any) {
-    errorMessage.value = '加载活动失败'
-  } finally {
-    loading.value = false
   }
+
+  loading.value = false
 }
 
 const handleCreateEvent = async (eventId: string | null, data: any) => {
