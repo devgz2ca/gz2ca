@@ -1,8 +1,10 @@
 import { defineEventHandler, getRouterParam, getQuery } from 'h3'
 import { Comment } from '../../../models/comment.schema'
+import { Event } from '../../../models/event.schema'
 import { User } from '../../../models/user.schema'
-import { handleBadRequest, handleInternalError } from '../../../utils/error'
+import { handleBadRequest, handleNotFound, handleInternalError } from '../../../utils/error'
 import { connectDB } from '../../../utils/db'
+import { isValidObjectId } from '../../../utils/mongo'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -14,15 +16,28 @@ export default defineEventHandler(async (event) => {
   try {
     await connectDB();
 
+    let eventDoc
+    if (isValidObjectId(id)) {
+      eventDoc = await Event.findById(id)
+    } else {
+      eventDoc = await Event.findOne({ url: id })
+    }
+
+    if (!eventDoc) {
+      return handleNotFound('活动不存在')
+    }
+
+    const eventId = eventDoc._id.toString()
+
     const query = getQuery(event)
     const page = parseInt(query.page as string) || 1
     const limit = parseInt(query.limit as string) || 20
     const skip = (page - 1) * limit
 
-    const total = await Comment.countDocuments({ event_id: id })
+    const total = await Comment.countDocuments({ event_id: eventId })
     const totalPages = Math.ceil(total / limit)
 
-    const comments = await Comment.find({ event_id: id })
+    const comments = await Comment.find({ event_id: eventId })
       .sort({ ts: -1 })
       .skip(skip)
       .limit(limit)
@@ -47,6 +62,9 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (error: any) {
+    if (error.statusCode) {
+      throw error
+    }
     console.error('Get comments error:', error);
     return handleInternalError('获取评论失败');
   }

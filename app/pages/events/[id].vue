@@ -208,7 +208,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import Button from '~/components/form/Button.vue'
 import EventInfo from '~/components/event/EventInfo.vue'
 import EventOrganizer from '~/components/event/EventOrganizer.vue'
@@ -351,10 +351,8 @@ const formatTime = (dateStr: string) => {
 }
 
 // Load comments when event is available
-watch(event, (newEvent) => {
-  if (newEvent?._id) {
-    loadComments()
-  }
+onMounted(()=>{
+  loadComments()
 })
 
 const loadMedia = async () => {
