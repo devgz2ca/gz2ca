@@ -41,9 +41,19 @@ export default defineEventHandler(async (event) => {
       Event.countDocuments()
     ])
     
+    // Fetch user info for each event
+    const userIds = [...new Set(events.map(e => e.user_id))]
+    const users = await User.find({ _id: { $in: userIds } }).select('fn ln eml')
+    const userMap = new Map(users.map(u => [u._id.toString(), u]))
+    
+    const eventsWithUser = events.map(e => ({
+      ...e.toObject(),
+      user: userMap.get(e.user_id) || null
+    }))
+    
     return {
       success: true,
-      events,
+      events: eventsWithUser,
       pagination: {
         page,
         limit,

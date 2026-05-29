@@ -71,6 +71,7 @@
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">活动名称</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布者</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">地点</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">活动日期</th>
@@ -90,6 +91,9 @@
                 <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
                   {{ evt.category || 'event' }}
                 </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ evt.user ? `${evt.user.fn || ''} ${evt.user.ln || ''}`.trim() || evt.user.eml : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
@@ -169,6 +173,7 @@ interface EventItem {
   category: string
   status: string
   place_id?: { _id: string; tl: string }
+  user?: { fn?: string; ln?: string; eml?: string }
   date: string
   views: number
   ts: string
