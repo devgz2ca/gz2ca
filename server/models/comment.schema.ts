@@ -17,10 +17,8 @@ export const Comment = defineMongooseModel('Comment', {
   },
   ts: {
     type: Date,
-    default: Date.now
   },
   mt: {
     type: Date,
-    default: Date.now
   }
 })
