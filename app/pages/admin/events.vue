@@ -46,8 +46,8 @@
     <!-- Admin Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-900">用户列表</h2>
-        <p class="text-sm text-gray-500 mt-1">共 {{ pagination.total }} 位用户</p>
+        <h2 class="text-xl font-semibold text-gray-900">活动列表</h2>
+        <p class="text-sm text-gray-500 mt-1">共 {{ pagination.total }} 个活动</p>
       </div>
       
       <!-- Loading -->
@@ -59,65 +59,76 @@
       <!-- Error -->
       <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
         {{ error }}
-        <Button @click="loadUsers" variant="secondary" class="mt-2">
+        <Button @click="loadEvents" variant="secondary" class="mt-2">
           重试
         </Button>
       </div>
       
-      <!-- Users Table -->
+      <!-- Events Table -->
       <div v-else class="bg-white rounded-xl shadow-sm overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">角色</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">毕业年份</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">所在地</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册时间</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">活动名称</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">地点</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">活动日期</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">浏览</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="u in users" :key="u._id" class="hover:bg-gray-50">
+            <tr v-for="evt in events" :key="evt._id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-[#11817b] flex items-center justify-center text-white font-medium">
-                    {{ getInitials(u) }}
-                  </div>
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ u.fn || '' }} {{ u.ln || '' }}
-                  </div>
+                <div class="text-sm font-medium text-gray-900 max-w-[200px] truncate" :title="evt.tl">
+                  {{ evt.tl }}
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ u.eml }}
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                  {{ evt.category || 'event' }}
+                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
                   :class="[
                     'px-2 py-1 text-xs font-medium rounded-full',
-                    u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'
+                    evt.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                   ]"
                 >
-                  {{ u.role === 'admin' ? '管理员' : '用户' }}
+                  {{ evt.status === 'published' ? '已发布' : '草稿' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ u.graduationYear || '-' }}
+                {{ evt.place_id?.tl || '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ u.location || '-' }}
+                {{ formatDate(evt.date) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ formatDate(u.ts) }}
+                {{ evt.views || 0 }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ formatDate(evt.ts) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <NuxtLink
+                  :to="`/events/${evt.url}`"
+                  target="_blank"
+                  class="text-[#11817b] hover:text-[#0d6b67] font-medium"
+                >
+                  查看
+                </NuxtLink>
               </td>
             </tr>
           </tbody>
         </table>
         
         <!-- Empty State -->
-        <div v-if="users.length === 0" class="text-center py-12">
-          <p class="text-gray-500">暂无用户</p>
+        <div v-if="events.length === 0" class="text-center py-12">
+          <p class="text-gray-500">暂无活动</p>
         </div>
       </div>
       
@@ -126,7 +137,7 @@
         <Button
           variant="secondary"
           :disabled="page <= 1"
-          @click="page--; loadUsers()"
+          @click="page--; loadEvents()"
         >
           上一页
         </Button>
@@ -136,7 +147,7 @@
         <Button
           variant="secondary"
           :disabled="page >= pagination.totalPages"
-          @click="page++; loadUsers()"
+          @click="page++; loadEvents()"
         >
           下一页
         </Button>
@@ -152,20 +163,21 @@ import Button from '~/components/form/Button.vue'
 import { get } from '~/utils/http'
 import { useUser } from '~/composables/useAuth'
 
-interface User {
+interface EventItem {
   _id: string
-  fn: string
-  ln: string
-  eml: string
-  role: string
-  graduationYear?: number
-  location?: string
+  tl: string
+  category: string
+  status: string
+  place_id?: { _id: string; tl: string }
+  date: string
+  views: number
   ts: string
+  url: string
 }
 
 const route = useRoute()
 const { user } = useUser()
-const users = ref<User[]>([])
+const events = ref<EventItem[]>([])
 const loading = ref(false)
 const error = ref('')
 const page = ref(1)
@@ -176,27 +188,21 @@ const pagination = ref({
   totalPages: 0
 })
 
-const loadUsers = async () => {
+const loadEvents = async () => {
   loading.value = true
   error.value = ''
   
   try {
-    const response = await get(`/api/admin/users?page=${page.value}`)
+    const response = await get(`/api/admin/events?page=${page.value}`)
     if (response.success) {
-      users.value = response.users
+      events.value = response.events
       pagination.value = response.pagination
     }
   } catch (err: any) {
-    error.value = err.data?.message || '加载用户列表失败'
+    error.value = err.data?.message || '加载活动列表失败'
   } finally {
     loading.value = false
   }
-}
-
-const getInitials = (u: User) => {
-  const fn = u.fn?.[0] || ''
-  const ln = u.ln?.[0] || ''
-  return (fn + ln).toUpperCase() || '?'
 }
 
 const formatDate = (dateStr: string) => {
@@ -209,6 +215,6 @@ onMounted(() => {
     navigateTo('/')
     return
   }
-  loadUsers()
+  loadEvents()
 })
 </script>

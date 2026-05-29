@@ -30,6 +30,15 @@
           >
             用户管理
           </NuxtLink>
+          <NuxtLink
+            to="/admin/events"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="route.path === '/admin/events' 
+              ? 'bg-[#11817b] text-white' 
+              : 'text-gray-600 hover:bg-gray-100'"
+          >
+            活动管理
+          </NuxtLink>
         </nav>
       </div>
     </header>
