@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12">
     <div class="max-w-md mx-auto px-4">
       <div class="bg-white rounded-xl shadow-lg p-8">
-        <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">注册账号</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">校友注册</h1>
 
         <form @submit.prevent="handleSignup" class="space-y-6">
           <Input
@@ -28,6 +28,23 @@
             label="姓"
             placeholder="请输入姓"
             required
+          />
+
+          <Input
+            id="graduationYear"
+            v-model="form.graduationYear"
+            label="毕业届别（年份）"
+            type="number"
+            placeholder="如：2005"
+            :min="1950"
+            :max="new Date().getFullYear()"
+          />
+
+          <Input
+            id="location"
+            v-model="form.location"
+            label="当前所在城市"
+            placeholder="如：多伦多、温哥华"
           />
 
           <PasswordInput
@@ -87,11 +104,13 @@ import { post } from '~/utils/http'
 import { SITE_NAME } from '~/constants'
 
 const form = ref({
-  fn:'',
-  ln:'',
+  fn: '',
+  ln: '',
   email: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
+  graduationYear: '',
+  location: ''
 })
 
 const loading = ref(false)
@@ -115,7 +134,9 @@ const handleSignup = async () => {
       fn: form.value.fn,
       ln: form.value.ln,
       email: form.value.email,
-      password: form.value.password
+      password: form.value.password,
+      graduationYear: form.value.graduationYear ? Number(form.value.graduationYear) : undefined,
+      location: form.value.location || undefined
     })
 
     successMessage.value = '注册成功！正在跳转到登录页面...'
@@ -131,9 +152,9 @@ const handleSignup = async () => {
 }
 
 useHead({
-  title: `注册 - ${SITE_NAME}`,
+  title: `校友注册 - ${SITE_NAME}`,
   meta: [
-    { name: 'description', content: `注册${SITE_NAME}社区账号。` },
+    { name: 'description', content: `注册广州市第二中学加拿大校友网账号，加入校友社区。` },
     { name: 'robots', content: 'noindex, nofollow' }
   ]
 })
