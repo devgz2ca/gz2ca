@@ -39,15 +39,6 @@
           >
             活动管理
           </NuxtLink>
-          <NuxtLink
-            to="/admin/news"
-            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            :class="route.path === '/admin/news' 
-              ? 'bg-[#11817b] text-white' 
-              : 'text-gray-600 hover:bg-gray-100'"
-          >
-            动态管理
-          </NuxtLink>
         </nav>
       </div>
     </header>

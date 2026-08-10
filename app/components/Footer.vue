@@ -17,7 +17,6 @@
             <li><NuxtLink to="/" class="text-gray-400 hover:text-white transition-colors">首页</NuxtLink></li>
             <li><NuxtLink to="/alumni" class="text-gray-400 hover:text-white transition-colors">校友名录</NuxtLink></li>
             <li><NuxtLink to="/events" class="text-gray-400 hover:text-white transition-colors">校友活动</NuxtLink></li>
-            <li><NuxtLink to="/news" class="text-gray-400 hover:text-white transition-colors">校友动态</NuxtLink></li>
             <li><NuxtLink to="/gallery" class="text-gray-400 hover:text-white transition-colors">校友相册</NuxtLink></li>
           </ul>
         </div>
