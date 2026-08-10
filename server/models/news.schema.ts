@@ -25,8 +25,6 @@ export const News = defineMongooseModel('News', {
   },
   status: {
     type: String,
-    enum: ['draft', 'published'],
-    default: 'published'
   },
   tags: {
     type: [String],
@@ -34,10 +32,8 @@ export const News = defineMongooseModel('News', {
   },
   ts: {
     type: Date,
-    default: Date.now
   },
   mt: {
     type: Date,
-    default: Date.now
   }
 })
