@@ -29,7 +29,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       },
       body: JSON.stringify(data)
     })
-    console.log(response);
+    console.log(await response.json())
     return response.ok
   } catch (error) {
     console.error('Brevo API error:', error)
