@@ -12,8 +12,8 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
   const data = {
     sender: {
-      name: '广州人在加拿大',
-      email: 'noreply@gz2ca.com'
+      name: '广州第二中学加拿大校友会',
+      email: 'noreply@gz2hsca.org'
     },
     to: [{ email: to }],
     subject,
