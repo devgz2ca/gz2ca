@@ -10,11 +10,6 @@
       </div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center relative z-10">
-        <!-- Logo Badge -->
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl mb-6 shadow-lg">
-          <span class="text-3xl font-bold">二中</span>
-        </div>
-
         <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">{{ SITE_NAME }}</h1>
         <p class="text-xl text-white/90 max-w-2xl mx-auto mb-4">
           广州市第二中学加拿大校友之家
