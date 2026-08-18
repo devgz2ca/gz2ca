@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   try {
     await connectDB();
 
-    const events = await Event.find({ status: 'published' })
+    const events = await Event.find({ status: 'published', approved: true })
       .populate('place_id')
       .sort({ date: -1 })
       .lean();

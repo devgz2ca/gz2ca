@@ -27,18 +27,31 @@ export default defineEventHandler(async (event) => {
       return handleForbidden('无权限访问')
     }
     
-    const query = getQuery(event)
+    const query = getQuery(event) as { page?: string; limit?: string; approved?: string; status?: string }
     const page = parseInt(query.page as string) || 1
     const limit = parseInt(query.limit as string) || 20
     const skip = (page - 1) * limit
-    
-    const [events, total] = await Promise.all([
-      Event.find()
+
+    // Approval filter: 'pending' = awaiting review, 'approved' = approved, undefined = all
+    const filter: any = {}
+    if (query.approved === 'pending') {
+      filter.approved = false
+    } else if (query.approved === 'approved') {
+      filter.approved = true
+    }
+    // Optional status filter
+    if (query.status) {
+      filter.status = query.status
+    }
+
+    const [events, total, pendingCount] = await Promise.all([
+      Event.find(filter)
         .populate('place_id', 'tl')
         .sort({ ts: -1 })
         .skip(skip)
         .limit(limit),
-      Event.countDocuments()
+      Event.countDocuments(filter),
+      Event.countDocuments({ approved: false })
     ])
     
     // Fetch user info for each event
@@ -54,6 +67,7 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       events: eventsWithUser,
+      pendingCount,
       pagination: {
         page,
         limit,

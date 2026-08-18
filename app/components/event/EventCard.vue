@@ -22,10 +22,10 @@
           v-if="showStatus"
           :class="[
             'px-3 py-1 rounded-full text-xs font-medium',
-            event.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+            getStatusInfo(event).class
           ]"
         >
-          {{ event.status === 'published' ? '已发布' : '草稿' }}
+          {{ getStatusInfo(event).label }}
         </span>
       </div>
 
@@ -119,6 +119,17 @@ defineEmits<{
 const stripHtml = (html: string): string => {
   if (!html) return ''
   return html.replace(/<[^>]*>/g, '').trim()
+}
+
+// Show approval status: draft < pending review < approved
+const getStatusInfo = (event: any): { label: string; class: string } => {
+  if (event.status !== 'published') {
+    return { label: '草稿', class: 'bg-gray-100 text-gray-600' }
+  }
+  if (event.approved === true) {
+    return { label: '已发布', class: 'bg-green-100 text-green-700' }
+  }
+  return { label: '待审核', class: 'bg-amber-100 text-amber-700' }
 }
 
 const handleClick = () => {

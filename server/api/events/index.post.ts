@@ -1,5 +1,6 @@
 import { defineEventHandler, readBody } from 'h3';
 import { Event } from '../../models/event.schema';
+import { User } from '../../models/user.schema';
 import { verifyToken } from '../../utils/jwt';
 import { upsertPlace } from '../../utils/place';
 import { extractToken } from '../../utils/auth';
@@ -21,6 +22,10 @@ export default defineEventHandler(async (event) => {
       return handleUnauthorized('用户不存在');
     }
 
+    // Check if creator is admin (admin-created events are auto-approved)
+    const userDoc = await User.findById(user._id).lean() as any;
+    const isAdmin = userDoc?.role === 'admin';
+
     const body = await readBody(event);
     const { tl, desc, date, place, status, url, category } = body;
 
@@ -35,6 +40,7 @@ export default defineEventHandler(async (event) => {
       url,
       category: category || 'event',
       status: status || 'draft',
+      approved: isAdmin ? true : false,
       ts: new Date(),
       mt: new Date()
     });
@@ -43,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      message: '活动创建成功',
+      message: isAdmin ? '活动创建成功' : '活动已提交，等待管理员审核通过后公开展示',
       event: populatedEvent
     };
   } catch (error: any) {

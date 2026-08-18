@@ -49,7 +49,31 @@
         <h2 class="text-xl font-semibold text-gray-900">活动列表</h2>
         <p class="text-sm text-gray-500 mt-1">共 {{ pagination.total }} 个活动</p>
       </div>
-      
+
+      <!-- Filter Tabs -->
+      <div class="flex gap-2 mb-6">
+        <button
+          v-for="tab in filterTabs"
+          :key="tab.value"
+          @click="setFilter(tab.value)"
+          :class="[
+            'px-4 py-2 rounded-lg text-sm font-medium transition-colors relative',
+            filter === tab.value
+              ? 'bg-[#11817b] text-white'
+              : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+          ]"
+        >
+          {{ tab.label }}
+          <span
+            v-if="tab.value === 'pending' && pendingCount > 0"
+            class="ml-1.5 px-1.5 py-0.5 text-xs rounded-full"
+            :class="filter === 'pending' ? 'bg-white/25 text-white' : 'bg-red-100 text-red-600'"
+          >
+            {{ pendingCount }}
+          </span>
+        </button>
+      </div>
+
       <!-- Loading -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#11817b]"></div>
@@ -96,14 +120,24 @@
                 {{ evt.user ? `${evt.user.fn || ''} ${evt.user.ln || ''}`.trim() || evt.user.eml : '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  :class="[
-                    'px-2 py-1 text-xs font-medium rounded-full',
-                    evt.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                  ]"
-                >
-                  {{ evt.status === 'published' ? '已发布' : '草稿' }}
-                </span>
+                <div class="flex flex-col gap-1">
+                  <span
+                    :class="[
+                      'px-2 py-1 text-xs font-medium rounded-full w-fit',
+                      evt.approved === true
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-amber-100 text-amber-700'
+                    ]"
+                  >
+                    {{ evt.approved === true ? '已审核' : '待审核' }}
+                  </span>
+                  <span
+                    v-if="evt.status !== 'published'"
+                    class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 w-fit"
+                  >
+                    草稿
+                  </span>
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ evt.place_id?.tl || '-' }}
@@ -118,13 +152,37 @@
                 {{ formatDate(evt.ts) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <NuxtLink
-                  :to="`/events/${evt.url}`"
-                  target="_blank"
-                  class="text-[#11817b] hover:text-[#0d6b67] font-medium"
-                >
-                  查看
-                </NuxtLink>
+                <div class="flex items-center gap-3">
+                  <NuxtLink
+                    :to="`/events/${evt.url}`"
+                    target="_blank"
+                    class="text-[#11817b] hover:text-[#0d6b67] font-medium"
+                  >
+                    查看
+                  </NuxtLink>
+                  <template v-if="evt.approved !== true">
+                    <button
+                      @click="approveEvent(evt, true)"
+                      class="text-green-600 hover:text-green-800 font-medium"
+                    >
+                      通过
+                    </button>
+                    <button
+                      @click="approveEvent(evt, false)"
+                      class="text-red-500 hover:text-red-700 font-medium"
+                    >
+                      拒绝
+                    </button>
+                  </template>
+                  <template v-else>
+                    <button
+                      @click="approveEvent(evt, false)"
+                      class="text-red-500 hover:text-red-700 font-medium"
+                    >
+                      撤销审核
+                    </button>
+                  </template>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -172,6 +230,7 @@ interface EventItem {
   tl: string
   category: string
   status: string
+  approved?: boolean
   place_id?: { _id: string; tl: string }
   user?: { fn?: string; ln?: string; eml?: string }
   date: string
@@ -186,6 +245,14 @@ const events = ref<EventItem[]>([])
 const loading = ref(false)
 const error = ref('')
 const page = ref(1)
+const filter = ref<'all' | 'pending' | 'approved'>('all')
+const pendingCount = ref(0)
+
+// Read initial filter from URL query (e.g. /admin/events?filter=pending)
+const initialFilter = route.query.filter as string
+if (initialFilter === 'pending' || initialFilter === 'approved') {
+  filter.value = initialFilter
+}
 const pagination = ref({
   page: 1,
   limit: 20,
@@ -193,20 +260,55 @@ const pagination = ref({
   totalPages: 0
 })
 
+const filterTabs = [
+  { label: '全部', value: 'all' },
+  { label: '待审核', value: 'pending' },
+  { label: '已审核', value: 'approved' }
+]
+
+const setFilter = (value: 'all' | 'pending' | 'approved') => {
+  filter.value = value
+  page.value = 1
+  loadEvents()
+}
+
 const loadEvents = async () => {
   loading.value = true
   error.value = ''
   
   try {
-    const response = await get(`/api/admin/events?page=${page.value}`)
+    const query = new URLSearchParams()
+    query.set('page', String(page.value))
+    if (filter.value !== 'all') {
+      query.set('approved', filter.value)
+    }
+    const response = await get(`/api/admin/events?${query.toString()}`)
     if (response.success) {
       events.value = response.events
       pagination.value = response.pagination
+      if (typeof response.pendingCount === 'number') {
+        pendingCount.value = response.pendingCount
+      }
     }
   } catch (err: any) {
     error.value = err.data?.message || '加载活动列表失败'
   } finally {
     loading.value = false
+  }
+}
+
+const approveEvent = async (evt: EventItem, approved: boolean) => {
+  const action = approved ? '通过审核' : '拒绝审核'
+  if (!confirm(`确定要${action}活动「${evt.tl}」吗？`)) return
+
+  try {
+    const { put } = await import('~/utils/http')
+    const response = await put(`/api/admin/events/${evt._id}`, { approved })
+    if (response.success) {
+      loadEvents()
+    }
+  } catch (err: any) {
+    error.value = err.data?.message || `${action}失败`
   }
 }
 
