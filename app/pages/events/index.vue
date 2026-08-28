@@ -34,6 +34,26 @@
         </div>
       </div>
 
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
+        <span class="text-sm font-medium text-gray-700">活动分类</span>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="category in categories"
+            :key="category.value"
+            type="button"
+            @click="filterCategory = category.value"
+            :class="[
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              filterCategory === category.value
+                ? 'bg-[#11817b] text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            ]"
+          >
+            {{ category.tl }}
+          </button>
+        </div>
+      </div>
+
       <EventList
         :events="displayedEvents"
         :loading="loading"
@@ -64,6 +84,7 @@ const loading = ref(true)
 const errorMessage = ref('')
 const events = ref<any[]>([])
 const filterView = ref<string>('all')
+const filterCategory = ref<string>('all')
 
 const filters = [
   { tl: '全部', value: 'all' },
@@ -71,16 +92,24 @@ const filters = [
   { tl: '往期活动', value: 'past' }
 ]
 
+const categories = [
+  { tl: '全部', value: 'all' },
+  { tl: '活动', value: 'event' },
+  { tl: '餐厅', value: 'restaurant' },
+  { tl: '教程/博客', value: 'tutorial' }
+]
+
 const displayedEvents = computed(() => {
   const now = new Date()
-  switch (filterView.value) {
-    case 'upcoming':
-      return events.value.filter((event: any) => new Date(event.date) >= now)
-    case 'past':
-      return events.value.filter((event: any) => new Date(event.date) < now)
-    default:
-      return events.value
-  }
+  return events.value.filter((event: any) => {
+    const matchesCategory = filterCategory.value === 'all' || event.category === filterCategory.value
+    const eventDate = new Date(event.date)
+
+    if (!matchesCategory) return false
+    if (filterView.value === 'upcoming') return eventDate >= now
+    if (filterView.value === 'past') return eventDate < now
+    return true
+  })
 })
 
 const loadEvents = async () => {
