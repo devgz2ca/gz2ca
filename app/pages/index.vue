@@ -10,6 +10,9 @@
       </div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center relative z-10">
+        <div class="mb-6 flex justify-center">
+          <img src="/logo.png" alt="GZ2CA logo" class="h-32 w-auto md:h-64" />
+        </div>
         <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">{{ SITE_NAME }}</h1>
         <p class="text-xl text-white/90 max-w-2xl mx-auto mb-4">
           广州市第二中学加拿大校友之家
