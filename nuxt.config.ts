@@ -37,7 +37,7 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#11817b' }
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/gz2ca.png' }
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' }
       ]
     }
   }
