@@ -8,7 +8,13 @@
         class="relative group aspect-square rounded-lg overflow-hidden cursor-pointer"
         @click="openLightbox(indexOf(item))"
       >
-        <img :src="item.thumb || item.src" :alt="item.src" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
+        <img :src="item.thumb || item.src" :alt="item.event_name || item.src" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
+        <div
+          v-if="item.event_name"
+          class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-8 pb-3 text-sm font-medium text-white"
+        >
+          <span class="block truncate">{{ item.event_name }}</span>
+        </div>
         <div v-if="canDelete" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
             type="button"
@@ -44,11 +50,15 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
       </Button>
-      <img
-        :src="currentImage?.src"
-        class="max-w-[90vw] max-h-[90vh] object-contain"
-        @click.stop
-      />
+      <div class="flex flex-col items-center max-w-[90vw] max-h-[90vh]" @click.stop>
+        <img
+          :src="currentImage?.src"
+          class="max-w-[90vw] max-h-[85vh] object-contain"
+        />
+        <p v-if="currentImage?.event_name" class="mt-3 text-white text-center font-medium">
+          {{ currentImage.event_name }}
+        </p>
+      </div>
       <Button
         type="button"
         variant="secondary"
@@ -86,6 +96,7 @@ interface MediaItem {
   src: string
   thumb: string
   ts: string
+  event_name?: string
 }
 
 interface Props {
