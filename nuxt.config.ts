@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      title: '广州市第二中学加拿大校友网',
       htmlAttrs: {
         lang: 'zh-CN'
       },
@@ -34,7 +35,15 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'charset', content: 'UTF-8' },
         { name: 'format-detection', content: 'telephone=no' },
-        { name: 'theme-color', content: '#11817b' }
+        { name: 'theme-color', content: '#11817b' },
+        { name: 'description', content: '广州市第二中学加拿大校友之家，联络旅加校友，传承二中精神，分享校友活动与动态。' },
+        { name: 'keywords', content: '广州二中, 广州市第二中学, 加拿大校友, 校友会, 校友活动' },
+        { property: 'og:site_name', content: '广州市第二中学加拿大校友网' },
+        { property: 'og:locale', content: 'zh_CN' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: '广州市第二中学加拿大校友网' },
+        { property: 'og:description', content: '广州市第二中学加拿大校友之家，联络旅加校友，传承二中精神，分享校友活动与动态。' },
+        { name: 'twitter:card', content: 'summary' }
       ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicon.png' }
