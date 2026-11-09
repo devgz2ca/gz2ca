@@ -121,6 +121,7 @@ const navigationMenus = computed(() => {
     { label: '首页', to: '/' },
     // { label: '校友名录', to: '/alumni' },
     { label: '校友活动', to: '/events' },
+    { label: '活动相册', to: '/gallery' },
     { label: '关于母校', to: '/about' },
     { label: '联系我们', to: '/contact' }
   ]
