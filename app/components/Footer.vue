@@ -21,12 +21,10 @@
           </ul>
         </div>
 
-        <!-- Contact & Links -->
         <div>
           <h3 class="text-white font-semibold mb-4">关于我们</h3>
           <ul class="space-y-2 text-sm">
             <li><NuxtLink to="/about" class="text-gray-400 hover:text-white transition-colors">关于母校</NuxtLink></li>
-            <li><NuxtLink to="/contact" class="text-gray-400 hover:text-white transition-colors">联系我们</NuxtLink></li>
           </ul>
         </div>
       </div>
