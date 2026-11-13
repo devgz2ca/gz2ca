@@ -8,7 +8,19 @@
         class="relative group aspect-square rounded-lg overflow-hidden cursor-pointer"
         @click="openLightbox(indexOf(item))"
       >
-        <img :src="item.thumb || item.src" :alt="item.event_name || item.src" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
+        <div
+          v-if="!loadedImages.has(item.thumb || item.src)"
+          class="absolute inset-0 bg-gray-200 animate-pulse"
+        />
+        <img
+          :src="item.thumb || item.src"
+          :alt="item.event_name || item.src"
+          :class="{ 'opacity-0': !loadedImages.has(item.thumb || item.src) }"
+          class="w-full h-full object-cover transition-[opacity,transform] group-hover:scale-105"
+          loading="lazy"
+          @load="markImageLoaded(item.thumb || item.src)"
+          @error="markImageLoaded(item.thumb || item.src)"
+        />
         <div
           v-if="item.event_name"
           class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-8 pb-3 text-sm font-medium text-white"
@@ -51,10 +63,20 @@
         </svg>
       </Button>
       <div class="flex flex-col items-center max-w-[90vw] max-h-[90vh]" @click.stop>
-        <img
-          :src="currentImage?.src"
-          class="max-w-[90vw] max-h-[85vh] object-contain"
-        />
+        <div class="relative flex h-[85vh] w-[90vw] items-center justify-center">
+          <div
+            v-if="lightboxImageLoading"
+            class="absolute z-10 h-10 w-10 animate-spin rounded-full border-4 border-white border-t-transparent"
+          />
+          <img
+            :src="currentImage?.src"
+            :class="{ 'opacity-0': lightboxImageLoading }"
+            class="max-h-full max-w-full object-contain transition-opacity duration-200"
+            loading="lazy"
+            @load="lightboxImageLoading = false"
+            @error="lightboxImageLoading = false"
+          />
+        </div>
         <p v-if="currentImage?.event_name" class="mt-3 text-white text-center font-medium">
           {{ currentImage.event_name }}
         </p>
@@ -88,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Button from '~/components/form/Button.vue'
 
 interface MediaItem {
@@ -114,9 +136,19 @@ const emit = defineEmits<{
 
 const lightboxOpen = ref(false)
 const currentIndex = ref(0)
+const loadedImages = ref(new Set<string>())
+const lightboxImageLoading = ref(true)
+
+const markImageLoaded = (src: string) => {
+  loadedImages.value.add(src)
+}
 
 const currentImage = computed(() => {
   return props.media[currentIndex.value]
+})
+
+watch(() => currentImage.value?.src, () => {
+  lightboxImageLoading.value = true
 })
 
 const indexOf = (item: MediaItem) => {
@@ -125,6 +157,7 @@ const indexOf = (item: MediaItem) => {
 
 const openLightbox = (index: number) => {
   currentIndex.value = index
+  lightboxImageLoading.value = true
   lightboxOpen.value = true
 }
 
