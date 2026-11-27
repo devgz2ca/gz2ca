@@ -119,6 +119,7 @@ const isOpen = ref(false)
 const navigationMenus = computed(() => {
   const menus = [
     { label: '首页', to: '/' },
+    { label: '96周年', to: '/anniversary-96' },
     // { label: '校友名录', to: '/alumni' },
     { label: '校友活动', to: '/events' },
     { label: '活动相册', to: '/gallery' },
